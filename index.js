@@ -1,17 +1,25 @@
 const express = require('express');
 const cors = require('cors');
-
 const app = express();
 
-// Enable CORS for all origins (temporary testing)
 app.use(cors());
+app.use(express.json());  // Allow JSON body parsing
 
+// Health check endpoint (this stays)
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
-// IMPORTANT: 0.0.0.0 to expose externally
+// 🟢 NEW: NPS Submission Endpoint
+app.post('/api/submit', (req, res) => {
+  const { email, score, feedback } = req.body;
+  console.log('Received NPS Submission:', { email, score, feedback });
+
+  // For now, just reply back with success
+  res.json({ message: 'Survey submitted successfully' });
+});
+
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server is running on port ${PORT}`);
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
