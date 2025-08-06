@@ -1,9 +1,8 @@
 const express = require('express');
 const cors = require('cors');
-const { pool } = require('./db');  // 👈 ADD THIS LINE
+const db = require('./db');  // ✅ Correct import
 
 const app = express();
-const db = require('./db');
 
 app.use(cors());
 app.use(express.json());
@@ -13,10 +12,10 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
-// GET Surveys Endpoint 👇 NEW
+// GET Surveys Endpoint
 app.get('/api/surveys', async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM surveys');
+    const result = await db.query('SELECT * FROM surveys');
     res.json(result.rows);
   } catch (err) {
     console.error(err);
@@ -24,7 +23,7 @@ app.get('/api/surveys', async (req, res) => {
   }
 });
 
-// Existing NPS Submission Endpoint (leave it)
+// Existing NPS Submission Endpoint
 app.post('/api/submit', async (req, res) => {
   const { email, score, feedback } = req.body;
 
@@ -41,3 +40,7 @@ app.post('/api/submit', async (req, res) => {
   }
 });
 
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
