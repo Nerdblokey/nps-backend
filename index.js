@@ -27,14 +27,17 @@ app.get('/api/surveys', async (req, res) => {
 // Existing NPS Submission Endpoint (leave it)
 app.post('/api/submit', async (req, res) => {
   const { email, score, feedback } = req.body;
+
   try {
     await db.query(
       'INSERT INTO surveys (email, score, feedback, created_at) VALUES ($1, $2, $3, NOW())',
       [email, score, feedback]
     );
-    res.json({ message: 'Survey saved successfully' });
+
+    res.json({ message: 'Survey submitted and saved!' });
   } catch (error) {
-    console.error('Database insert error:', error);
+    console.error('Database Insert Error:', error);
     res.status(500).json({ error: 'Failed to save survey' });
   }
 });
+
