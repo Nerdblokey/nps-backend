@@ -3,6 +3,8 @@ const cors = require('cors');
 const { pool } = require('./db');  // 👈 ADD THIS LINE
 
 const app = express();
+const db = require('./db');
+
 app.use(cors());
 app.use(express.json());
 
@@ -23,13 +25,16 @@ app.get('/api/surveys', async (req, res) => {
 });
 
 // Existing NPS Submission Endpoint (leave it)
-app.post('/api/submit', (req, res) => {
+app.post('/api/submit', async (req, res) => {
   const { email, score, feedback } = req.body;
-  console.log('Received NPS Submission:', { email, score, feedback });
-  res.json({ message: 'Survey submitted successfully' });
-});
-
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  try {
+    await db.query(
+      'INSERT INTO surveys (email, score, feedback, created_at) VALUES ($1, $2, $3, NOW())',
+      [email, score, feedback]
+    );
+    res.json({ message: 'Survey saved successfully' });
+  } catch (error) {
+    console.error('Database insert error:', error);
+    res.status(500).json({ error: 'Failed to save survey' });
+  }
 });
